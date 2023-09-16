@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/src/style.css">
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
+  <title>Document</title>
+</head>
+
+<body class="bg-gray-900">
+  <section class="h-screen flex flex-col justify-between">
+    <div>
+      <div class="w-full">
+        <div class="flex gap-8 items-baseline justify-center">
+          <img width="100" src="/static/image/moeys_logo.png" alt />
+          <img src="/static/image/techno.png" class="w-32 object-fill" alt />
+        </div>
+      </div>
+
+      <h1 class="text-center mt-5 text-5xl text-white mb-5">
+        Heart Sound Prediction
+      </h1>
+      <div class="m-auto flex flex-col max-w-4xl md:flex-row p-3 shadow-md gap-2"
+        style="box-shadow: 1px 1px 60px 1px rgba(0, 0, 0, 0.515)">
+        <div class="w-full md:w-6/12">
+          <form action id="form">
+            <label for="file">
+              <div
+                class="flex flex-col justify-center items-center w-full upload-area border-2 border-red-500 border-dashed"
+                style="height: 400px">
+                <img src="/static/image/heart.png" width="100" class="animate-scale" alt />
+                <!-- <ion-icon class="text-3xl" name="duplicate-outline"></ion-icon> -->
+                <h1 id="drop-area" class="text-xl text-red-500">
+                  Click to upload or Drap and drop file here
+                </h1>
+              </div>
+            </label>
+            <input class="m-auto" style="display: none" type="file" id="file" name="file" />
+          </form>
+        </div>
+        <div class="md:w-1 hidden md:bg-red-500 md:block" style="height: 400px"></div>
+        <div class="w-full md:w-6/12 flex justify-center items-center" style="height: 400px">
+          <h1 class="text-4xl text-white" id="result">The Result show here...
+           
+          </h1>
+        </div>
+      </div>
+    </div>
+    <footer class="w-full p-2 bg-gray-900 text-center shadow-2xl">
+      <p class="text-white">All right Research @2023</p>
+    </footer>
+  </section>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+    crossorigin="anonymous"></script>
+  <script>
+    $(function () {
+      // preventing page from redirecting
+      $("html").on("dragover", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#drop-area").text("Drag here");
+      });
+
+      $("html").on("drop", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+
+      // Drag enter
+      $(".upload-area").on("dragenter", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $("#drop-area").text("Drop");
+      });
+
+      // Drag over
+      $(".upload-area").on("dragover", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $("#drop-area").text("Drop");
+      });
+
+      // Drop
+      $(".upload-area").on("drop", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var fileData = new FormData()
+        $("#drop-area").text("File Uploaded Succesfully!");
+
+        var file = e.originalEvent.dataTransfer.files;
+        fileData.append("audio_file", file[0])
+        SendAudio(fileData)
+      });
+    
+      // Open file selector on div click
+      $("#uploadfile").click(function () {
+        $("file").click();
+      });
+
+
+      $("#file").change(function (e) {
+        e.stopPropagation();
+        e.preventDefault()
+        var fileData = new FormData()
+        var file = document.getElementById("file")
+        fileData.append("audio_file", file.files[0])
+        $("#drop-area").text("File Uploaded Succesfully!");
+        SendAudio(fileData)
+      });
+      function SendAudio(file) {
+
+$.ajax({
+  url: "/upload",
+  type: "POST",
+  data: file,
+  contentType: false,
+  processData: false,
+  success: function (data) {
+    
+    $("#result").html(`<ion-icon name="aperture-outline" class="animate-spin text-white " style="font-size: 80px;"  ></ion-icon>`)
+    setTimeout(()=>{
+      $("#result").html(data)
+      $("#drop-area").text("Upload another file!");
+    },1000)
+     
+  },
+  error: function (xhr, status, error) {
+    console.log("error");
+  },
+});
+}
+    });
+  </script>
+</body>
+
+</html>
